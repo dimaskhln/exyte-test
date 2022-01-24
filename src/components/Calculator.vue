@@ -35,9 +35,9 @@
         <v-radio label="Формула" :value="1"></v-radio>
       </v-radio-group>
     </v-container>
+    <v-card-text v-if="isFormulaError" class="red--text">Ошибка ввода</v-card-text>
   </v-card>
 </template>
-<title>Blockchain calculator</title>
 <script>
 import AppVue from '../App.vue';
 export default {
@@ -50,6 +50,7 @@ export default {
       done: false,
       isEqualPressed: false,
       inputType: 0,
+      isFormulaError: false,
     };
   },
   render: (createElement) => {
@@ -81,32 +82,36 @@ export default {
       this.action = act;
     },
     equals: function () {
-      if (this.inputType == 0) {
-        if (!this.done) {
-          this.value2 = Number(this.value);
-        }
+      try {
+        if (this.inputType == 0) {
+          if (!this.done) {
+            this.value2 = Number(this.value);
+          }
 
-        switch (this.action) {
-          case 'add':
-            this.value1 = this.value = this.value1 + this.value2;
-            this.done = true;
-            break;
-          case 'subtract':
-            this.value1 = this.value = this.value1 - this.value2;
-            this.done = true;
-            break;
-          case 'multiply':
-            this.value1 = this.value = this.value1 * this.value2;
-            this.done = true;
-            break;
-          case 'divide':
-            this.value1 = this.value = this.value1 / this.value2;
-            this.done = true;
-            break;
+          switch (this.action) {
+            case 'add':
+              this.value1 = this.value = this.value1 + this.value2;
+              this.done = true;
+              break;
+            case 'subtract':
+              this.value1 = this.value = this.value1 - this.value2;
+              this.done = true;
+              break;
+            case 'multiply':
+              this.value1 = this.value = this.value1 * this.value2;
+              this.done = true;
+              break;
+            case 'divide':
+              this.value1 = this.value = this.value1 / this.value2;
+              this.done = true;
+              break;
+          }
+          this.isEqualPressed = true;
+        } else {
+          this.value = eval(this.value);
         }
-        this.isEqualPressed = true;
-      } else {
-        this.value = eval(this.value);
+      } catch {
+        this.isFormulaError = true;
       }
     },
     isNumber: function (evt) {
@@ -118,69 +123,176 @@ export default {
         } else {
           return true;
         }
+      } else {
+        if (charCode > 31 && (charCode < 48 || charCode > 57) && charCode !== 46 && charCode !== 42 && charCode !== 43 && charCode !== 45 && charCode !== 47) {
+          evt.preventDefault();
+        } else {
+          return true;
+        }
       }
     },
   },
   created() {
     window.addEventListener('keydown', (e) => {
+      this.isFormulaError = false;
       if (this.inputType == 0) {
         switch (e.code) {
-          case 'Numpad1' || 'Digit1':
+          case 'Numpad1':
+          case 'Digit1':
             document.activeElement.blur();
             this.write('1');
             break;
-          case 'Numpad2' || 'Digit2':
+          case 'Numpad2':
+          case 'Digit2':
             document.activeElement.blur();
             this.write('2');
             break;
-          case 'Numpad3' || 'Digit3':
+          case 'Numpad3':
+          case 'Digit3':
             document.activeElement.blur();
             this.write('3');
             break;
-          case 'Numpad4' || 'Digit4':
+          case 'Numpad4':
+          case 'Digit4':
             document.activeElement.blur();
             this.write('4');
             break;
-          case 'Numpad5' || 'Digit5':
+          case 'Numpad5':
+          case 'Digit5':
             document.activeElement.blur();
             this.write('5');
             break;
-          case 'Numpad6' || 'Digit6':
+          case 'Numpad6':
+          case 'Digit6':
             document.activeElement.blur();
             this.write('6');
             break;
-          case 'Numpad7' || 'Digit7':
+          case 'Numpad7':
+          case 'Digit7':
             document.activeElement.blur();
             this.write('7');
             break;
-          case 'Numpad8' || 'Digit8':
+          case 'Numpad8':
+          case 'Digit8':
             document.activeElement.blur();
             this.write('8');
             break;
-          case 'Numpad9' || 'Digit9':
+          case 'Numpad9':
+          case 'Digit9':
             document.activeElement.blur();
             this.write('9');
             break;
-          case 'Numpad0' || 'Digit0':
+          case 'Numpad0':
+          case 'Digit0':
             document.activeElement.blur();
             this.write('0');
             break;
-          case 'NumpadDecimal' || 'Period':
+          case 'NumpadDecimal':
+          case 'Period':
             this.write('.');
             break;
-          case 'NumpadDivide' || 'Slash':
+          case 'NumpadDivide':
+          case 'Slash':
             this.remember('divide');
             break;
           case 'NumpadMultiply':
             this.remember('multiply');
             break;
-          case 'NumpadSubtract' || 'Minus':
+          case 'NumpadSubtract':
+          case 'Minus':
             this.remember('subtract');
             break;
           case 'NumpadAdd':
             this.remember('add');
             break;
-          case 'NumpadEnter' || 'Enter' || 'Equal':
+          case 'NumpadEnter':
+          case 'Enter':
+          case 'Equal':
+            this.equals();
+            break;
+          case 'Escape':
+            this.reset();
+            break;
+          case 'Backspace':
+            if (this.value != '0') {
+              this.value = this.value.substr(0, this.value.length - 1);
+            }
+
+            break;
+        }
+      } else {
+        switch (e.code) {
+          case 'Numpad1':
+          case 'Digit1':
+            document.activeElement.blur();
+            this.write('1');
+            break;
+          case 'Numpad2':
+          case 'Digit2':
+            document.activeElement.blur();
+            this.write('2');
+            break;
+          case 'Numpad3':
+          case 'Digit3':
+            document.activeElement.blur();
+            this.write('3');
+            break;
+          case 'Numpad4':
+          case 'Digit4':
+            document.activeElement.blur();
+            this.write('4');
+            break;
+          case 'Numpad5':
+          case 'Digit5':
+            document.activeElement.blur();
+            this.write('5');
+            break;
+          case 'Numpad6':
+          case 'Digit6':
+            document.activeElement.blur();
+            this.write('6');
+            break;
+          case 'Numpad7':
+          case 'Digit7':
+            document.activeElement.blur();
+            this.write('7');
+            break;
+          case 'Numpad8':
+          case 'Digit8':
+            document.activeElement.blur();
+            this.write('8');
+            break;
+          case 'Numpad9':
+          case 'Digit9':
+            document.activeElement.blur();
+            this.write('9');
+            break;
+          case 'Numpad0':
+          case 'Digit0':
+            document.activeElement.blur();
+            this.write('0');
+            break;
+          case 'NumpadDecimal':
+          case 'Period':
+            this.write('.');
+            break;
+          case 'NumpadDivide':
+          case 'Slash':
+            this.write('/');
+            break;
+          case 'NumpadMultiply':
+            this.write('*');
+            break;
+          case 'NumpadSubtract':
+          case 'Minus':
+            this.write('-');
+            break;
+          case 'NumpadAdd':
+            this.write('+');
+            break;
+          case 'NumpadEnter':
+          case 'Enter':
+          case 'Equal':
             this.equals();
             break;
           case 'Escape':
